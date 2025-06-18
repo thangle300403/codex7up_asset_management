@@ -31,7 +31,7 @@ const Header = () => {
 
         <div
           className="navbar-right"
-          style={{ display: "flex", alignItems: "center", Width: "100%" }}
+          style={{ display: "flex", alignItems: "center", Width: "100%"}}
         >
           <input
             type="text"
@@ -42,12 +42,13 @@ const Header = () => {
               height: 40,
               marginLeft: "10px",
               padding: "0 10px",
+              paddingRight: "30px",
               borderRadius: "4px",
               border: "1px solid #ccc",
             }}
           />
 
-          <ul className="nav-links">
+          <ul className="nav-links" style={{ display: "flex", listStyle: "none", marginLeft: "20px" }}>
             <li>
               <NavLink to="/assets" activeClassName="active">
                 Assets

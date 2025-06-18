@@ -28,6 +28,7 @@ const tableStyles = {
     border: "none",
     padding: "10px 20px",
     borderRadius: "6px",
+    fontWeight: "bold",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -146,72 +147,73 @@ const AssetList = () => {
   }
 
   return (
-    <div style={tableStyles.container}>
-      <div style={tableStyles.header}>
-        <h2 style={tableStyles.title}>Asset Management</h2>
-        <Link to="/assets/add">
-          <button style={tableStyles.addButton}>
-            <span>➕</span>
-            Add New Asset
-          </button>
-        </Link>
-      </div>
+    <div style={{ backgroundColor: "#f4f4f4", minHeight: "100vh", padding: "20px" }}>
+      <div style={tableStyles.container}>
+        <div style={tableStyles.header}>
+          <h2 style={tableStyles.title}>Asset Management</h2>
+          <Link to="/assets/add" style={{ textDecoration: "none" }}>
+            <button style={tableStyles.addButton}>
+              Add New Asset
+            </button>
+          </Link>
+        </div>
 
-      <table style={tableStyles.table}>
-        <thead>
-          <tr>
-            <th style={tableStyles.th}>ID</th>
-            <th style={tableStyles.th}>Name</th>
-            <th style={tableStyles.th}>Description</th>
-            <th style={tableStyles.th}>Department</th>
-            <th style={tableStyles.th}>Status</th>
-            <th style={tableStyles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {assets.map((a) => (
-            <tr key={a.id}>
-              <td style={tableStyles.td}>{a.id}</td>
-              <td style={tableStyles.td}>{a.name}</td>
-              <td style={tableStyles.td}>{a.description}</td>
-              <td style={tableStyles.td}>{a.department}</td>
-              <td style={tableStyles.td}>
-                <span
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    ...getStatusStyle(a.currentStatus),
-                  }}
-                >
-                  {a.currentStatus}
-                </span>
-              </td>
-              <td style={tableStyles.td}>
-                <Link to={`/assets/edit/${a.id}`}>
-                  <button
+        <table style={tableStyles.table}>
+          <thead>
+            <tr>
+              <th style={tableStyles.th}>ID</th>
+              <th style={tableStyles.th}>Name</th>
+              <th style={tableStyles.th}>Description</th>
+              <th style={tableStyles.th}>Department</th>
+              <th style={tableStyles.th}>Status</th>
+              <th style={tableStyles.th}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assets.map((a) => (
+              <tr key={a.id}>
+                <td style={tableStyles.td}>{a.id}</td>
+                <td style={tableStyles.td}>{a.name}</td>
+                <td style={tableStyles.td}>{a.description}</td>
+                <td style={tableStyles.td}>{a.department}</td>
+                <td style={tableStyles.td}>
+                  <span
                     style={{
-                      ...tableStyles.actionButton,
-                      ...tableStyles.editButton,
+                      padding: "4px 8px",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      ...getStatusStyle(a.currentStatus),
                     }}
                   >
-                    Edit
+                    {a.currentStatus}
+                  </span>
+                </td>
+                <td style={tableStyles.td}>
+                  <Link to={`/assets/edit/${a.id}`}>
+                    <button
+                      style={{
+                        ...tableStyles.actionButton,
+                        ...tableStyles.editButton,
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(a.id)}
+                    style={{
+                      ...tableStyles.actionButton,
+                      ...tableStyles.deleteButton,
+                    }}
+                  >
+                    Delete
                   </button>
-                </Link>
-                <button
-                  onClick={() => handleDelete(a.id)}
-                  style={{
-                    ...tableStyles.actionButton,
-                    ...tableStyles.deleteButton,
-                  }}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
