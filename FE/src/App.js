@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <body>
-        <div style={{ minHeight: "61vh" }}>
+        <div style={{ minHeight: "62vh" }}>
           <Header />
           <AppRoutes />
         </div>
