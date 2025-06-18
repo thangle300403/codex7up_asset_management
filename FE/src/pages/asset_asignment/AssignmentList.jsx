@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../component/box";
-import Pagination from "../../component/Pagination";
+import { Box } from "../../components/Box";
+import Pagination from "../../components/Pagination";
 
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
