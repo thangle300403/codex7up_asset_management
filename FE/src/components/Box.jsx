@@ -14,6 +14,7 @@ export const Box = ({ children }) => {
         gap: "8px",
         marginBottom: "16px",
         maxHeight: "200px",
+        minWidth: "400px",
       }}
     >
       {children}

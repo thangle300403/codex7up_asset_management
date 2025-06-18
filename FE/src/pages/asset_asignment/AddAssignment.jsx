@@ -1,102 +1,132 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const AddAssignment = () => {
-  const [assets, setAssets] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [formData, setFormData] = useState({
-    asset_id: "",
-    department_id: "",
+  const [form, setForm] = useState({
+    asset: "",
+    department: "",
     assigned_date: "",
   });
+
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/assets")
-      .then((res) => setAssets(res.data));
-    axios
-      .get("http://localhost:3000/api/departments")
-      .then((res) => setDepartments(res.data));
-  }, []);
-
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setForm({
+      ...form,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      await axios.post(
-        "http://localhost:3000/api/assignments/create",
-        formData
-      );
-      alert("✅ Assignment created successfully!");
+      await axios.post("http://localhost:3000/api/assignments", form);
+      alert("Assignment added successfully!");
       navigate("/assignments");
     } catch (err) {
-      console.error("❌ Error creating assignment:", err);
-      alert("Failed to create assignment.");
+      console.error("Failed to add assignment:", err);
+      alert(err.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Assign Asset to Department</h2>
-      <form onSubmit={handleSubmit} style={{ maxWidth: "500px" }}>
+    <div style={{ padding: "24px", maxWidth: "600px", margin: "0 auto" }}>
+      <h2>Add New Assignment</h2>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          marginTop: "16px",
+          padding: "24px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          backgroundColor: "#fff",
+        }}
+      >
         <div>
-          <label>Asset:</label>
-          <br />
-          <select
-            name="asset_id"
-            value={formData.asset_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Select Asset --</option>
-            {assets.map((asset) => (
-              <option key={asset.id} value={asset.id}>
-                {asset.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginTop: "12px" }}>
-          <label>Department:</label>
-          <br />
-          <select
-            name="department_id"
-            value={formData.department_id}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Select Department --</option>
-            {departments.map((dep) => (
-              <option key={dep.id} value={dep.id}>
-                {dep.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginTop: "12px" }}>
-          <label>Assigned Date:</label>
-          <br />
+          <label htmlFor="asset" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
+            Asset
+          </label>
           <input
-            type="date"
-            name="assigned_date"
-            value={formData.assigned_date}
+            type="text"
+            id="asset"
+            name="asset"
+            value={form.asset}
             onChange={handleChange}
             required
+            placeholder="Enter asset name"
+            style={{
+              width: "96%",
+              padding: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+            }}
           />
         </div>
 
-        <button type="submit" style={{ marginTop: "20px" }}>
-          ➕ Assign
+        <div>
+          <label htmlFor="department" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
+            Department
+          </label>
+          <input
+            type="text"
+            id="department"
+            name="department"
+            value={form.department}
+            onChange={handleChange}
+            required
+            placeholder="Enter department"
+            style={{
+              width: "96%",
+              padding: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="assigned_date" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
+            Assigned Date
+          </label>
+          <input
+            type="date"
+            id="assigned_date"
+            name="assigned_date"
+            value={form.assigned_date}
+            onChange={handleChange}
+            required
+            style={{
+              width: "98%",
+              padding: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: "12px",
+            backgroundColor: "#4CAF50",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "Submitting..." : "Add Assignment"}
         </button>
       </form>
     </div>
