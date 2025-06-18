@@ -48,8 +48,6 @@ const Assignment = {
         return result.affectedRows > 0;
     },
 
-    // Assignment.js
-
     async getPaginated(page = 1, limit = 10) {
         const offset = (page - 1) * limit;
 
@@ -77,8 +75,7 @@ const Assignment = {
             currentPage: page,
             items: dataRows
         };
-    }
-
+    },
 };
 
 module.exports = Assignment;

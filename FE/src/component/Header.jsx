@@ -6,12 +6,33 @@ import "./Header.css";
 const Header = () => {
   return (
     <header className="header">
-      <nav className="navbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <nav
+        className="navbar"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <div className="navbar-brand">
-          <h1 style={{fontSize: "30px"}}><Link to="/"  style={{color: "white", textDecoration: "none", fontWeight: "bold"}} ><img src="/home.png" style={{fontSize: "30"}}/> ASSET MANAGER</Link></h1>
+          <h1 style={{ fontSize: "30px" }}>
+            <Link
+              to="/"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              <img src="/home.png" style={{ fontSize: "30" }} /> ASSET MANAGER
+            </Link>
+          </h1>
         </div>
 
-        <div className="navbar-right" style={{ display: "flex", alignItems: "center", Width: "100%"}}>
+        <div
+          className="navbar-right"
+          style={{ display: "flex", alignItems: "center", Width: "100%" }}
+        >
           <input
             type="text"
             placeholder="🔍 Search for anything..."

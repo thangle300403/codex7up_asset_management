@@ -79,7 +79,6 @@ const AssetAssignmentController = {
             res.status(500).json({ message: "Error loading paginated assignments" });
         }
     },
-
 };
 
 module.exports = AssetAssignmentController;
