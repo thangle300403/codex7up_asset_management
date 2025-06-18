@@ -1,16 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const AddAssignment = () => {
   const [form, setForm] = useState({
-    asset: "",
-    department: "",
+    asset_id: "",
+    department_id: "",
     assigned_date: "",
   });
 
+  const [assets, setAssets] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch assets
+    axios.get("http://localhost:3000/api/assets")
+      .then((res) => setAssets(res.data))
+      .catch((err) => console.error("Error fetching assets:", err));
+
+    // Fetch departments
+    axios.get("http://localhost:3000/api/departments")
+      .then((res) => setDepartments(res.data))
+      .catch((err) => console.error("Error fetching departments:", err));
+  }, []);
 
   const handleChange = (e) => {
     setForm({
@@ -21,18 +35,19 @@ const AddAssignment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
-      await axios.post("http://localhost:3000/api/assignments", form);
-      alert("Assignment added successfully!");
+      await axios.post(
+        "http://localhost:3000/api/assignments/create",
+        form
+      );
+      alert("✅ Assignment created successfully!");
       navigate("/assignments");
     } catch (err) {
-      console.error("Failed to add assignment:", err);
-      alert(err.response?.data?.message || "Something went wrong.");
-    } finally {
-      setLoading(false);
+      console.error("❌ Error creating assignment:", err);
+      alert("Failed to create assignment.");
     }
   };
+
 
   return (
     <div style={{ padding: "24px", maxWidth: "600px", margin: "0 auto" }}>
@@ -52,45 +67,53 @@ const AddAssignment = () => {
         }}
       >
         <div>
-          <label htmlFor="asset" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
+          <label htmlFor="asset_id" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
             Asset
           </label>
-          <input
-            type="text"
-            id="asset"
-            name="asset"
-            value={form.asset}
+          <select
+            name="asset_id"
+            value={form.asset_id}
             onChange={handleChange}
             required
-            placeholder="Enter asset name"
             style={{
-              width: "96%",
+              width: "100%",
               padding: "10px",
               borderRadius: "4px",
               border: "1px solid #ccc",
             }}
-          />
+          >
+            <option value="">-- Select Asset --</option>
+            {assets.map((asset) => (
+              <option key={asset.id} value={asset.id}>
+                {asset.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
-          <label htmlFor="department" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
+          <label htmlFor="department_id" style={{ display: "block", fontWeight: "bold", marginBottom: "4px" }}>
             Department
           </label>
-          <input
-            type="text"
-            id="department"
-            name="department"
-            value={form.department}
+          <select
+            name="department_id"
+            value={form.department_id}
             onChange={handleChange}
             required
-            placeholder="Enter department"
             style={{
-              width: "96%",
+              width: "100%",
               padding: "10px",
               borderRadius: "4px",
               border: "1px solid #ccc",
             }}
-          />
+          >
+            <option value="">-- Select Department --</option>
+            {departments.map((dept) => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -105,7 +128,7 @@ const AddAssignment = () => {
             onChange={handleChange}
             required
             style={{
-              width: "98%",
+              width: "96%",
               padding: "10px",
               borderRadius: "4px",
               border: "1px solid #ccc",
