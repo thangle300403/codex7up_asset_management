@@ -1,25 +1,50 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+
 import { Box } from "../../components/box";
+
+import Pagination from "../../component/Pagination";
+
+const handleDelete = (id) => {
+  if (window.confirm("Are you sure you want to delete this department?")) {
+    axios
+      .delete(`http://localhost:3000/api/assignments/${id}`)
+      .then(() => {
+        alert("Assignment deleted!");
+        window.location.reload(); // Or update state
+      })
+      .catch((err) => {
+        alert(err.response?.data?.message || "Delete failed");
+      });
+  }
+};
+
 
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
 
   // Fetch assignments
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/assignments")
-      .then((res) => {
-        setAssignments(res.data);
+    console.log(`Fetching page: ${currentPage}`);
+    fetch(
+      `http://localhost:3000/api/assignments?page=${currentPage}&limit=${limit}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setAssignments(data.items);
+        setTotalPages(data.totalPages);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching assignments:", err);
+        console.error("Fetch failed:", err);
         setLoading(false);
       });
-  }, []);
+  }, [currentPage]);
 
   // Handle delete
   const handleDelete = (id) => {
@@ -93,7 +118,13 @@ const AssignmentList = () => {
           </Box>
         ))
       )}
+
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

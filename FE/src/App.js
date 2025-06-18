@@ -2,9 +2,20 @@ import React from "react";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import AppRoutes from "./routes/Router";
 
+import Header from "./component/Header";
+import Footer from "./component/Footer";
+
 function App() {
   return (
-    <AppRoutes />
+    <>
+      <body>
+        <div style={{ minHeight: "61vh" }}>
+          <Header />
+          <AppRoutes />
+        </div>
+        <Footer />
+      </body>
+    </>
   );
 }
 

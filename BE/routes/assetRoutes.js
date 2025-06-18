@@ -23,7 +23,8 @@ router.get('/statuses/:id', StatusController.getById);
 router.put('/statuses/:id', StatusController.update);
 router.delete("/statuses/:id", StatusController.deleteStatus);
 
-router.get('/assignments', AssetAssignmentController.getAll);
+router.get('/assignments/all', AssetAssignmentController.getAll);
+router.get("/assignments", AssetAssignmentController.getPaginated);
 router.post('/assignments/create', AssetAssignmentController.create);
 router.delete('/assignments/:id', AssetAssignmentController.delete);
 router.get("/assignments/:id", AssetAssignmentController.getById);
