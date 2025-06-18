@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../component/Box";
+import { Box } from "../../component/box";
 import Pagination from "../../component/Pagination";
 
 const AssignmentList = () => {
@@ -9,7 +9,7 @@ const AssignmentList = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const limit = 6;
 
   const fetchAssignments = async (page) => {
     try {
@@ -94,7 +94,13 @@ const AssignmentList = () => {
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div
                   className="title"
-                  style={{ display: "flex", justifyContent: "space-between" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center", // vertically align text and buttons
+                    flexWrap: "wrap",
+                    gap: "8px",
+                  }}
                 >
                   <h3>
                     <strong>ID:</strong> {a.id}
@@ -102,6 +108,36 @@ const AssignmentList = () => {
                   <h3>
                     <strong>Asset:</strong> {a.asset}
                   </h3>
+                  <div
+                    className="buttons-container"
+                    style={{ display: "flex", gap: "8px", marginTop: "8px",display: "flex", justifyContent: "center" }}
+                  >
+                    <Link to={`/assignments/edit/${a.id}`}>
+                      <button
+                        style={{
+                          padding: "8px 16px",
+                          backgroundColor: "#4CAF50",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      style={{
+                        border: "none",
+                        backgroundColor: "#ff4d4d",
+                        color: "white",
+                        padding: "8px 16px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
                 <div className="description">
                   <p>
@@ -112,36 +148,7 @@ const AssignmentList = () => {
                     {new Date(a.assigned_date).toLocaleDateString()}
                   </p>
                 </div>
-                <div
-                  className="buttons-container"
-                  style={{ display: "flex", gap: "8px", marginTop: "8px" }}
-                >
-                  <Link to={`/assignments/edit/${a.id}`}>
-                    <button
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      Edit
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(a.id)}
-                    style={{
-                      border: "none",
-                      backgroundColor: "#ff4d4d",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
+                
               </div>
             </Box>
           ))
