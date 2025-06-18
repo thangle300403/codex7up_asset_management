@@ -1,12 +1,18 @@
 import React from "react";
 import AppRoutes from "./routes/Router";
 import Header from "./component/Header";
+import Footer from "./component/Footer";
 
 function App() {
   return (
     <>
-      <Header />
-      <AppRoutes />
+      <body>
+        <div style={{ minHeight: "61vh" }}>
+          <Header />
+          <AppRoutes />
+        </div>
+        <Footer />
+      </body>
     </>
   );
 }
