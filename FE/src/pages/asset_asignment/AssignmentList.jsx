@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Pagination from "../../component/Pagination";
 
 const handleDelete = (id) => {
   if (window.confirm("Are you sure you want to delete this department?")) {
@@ -19,19 +20,26 @@ const handleDelete = (id) => {
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/assignments")
-      .then((res) => {
-        setAssignments(res.data);
+    console.log(`Fetching page: ${currentPage}`);
+    fetch(
+      `http://localhost:3000/api/assignments?page=${currentPage}&limit=${limit}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setAssignments(data.items);
+        setTotalPages(data.totalPages);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching assignments:", err);
+        console.error("Fetch failed:", err);
         setLoading(false);
       });
-  }, []);
+  }, [currentPage]);
 
   if (loading) return <p>Loading assignments...</p>;
 
@@ -88,6 +96,11 @@ const AssignmentList = () => {
           </tbody>
         </table>
       )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

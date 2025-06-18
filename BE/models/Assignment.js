@@ -46,7 +46,39 @@ const Assignment = {
             [assigned_date, id]
         );
         return result.affectedRows > 0;
+    },
+
+    // Assignment.js
+
+    async getPaginated(page = 1, limit = 10) {
+        const offset = (page - 1) * limit;
+
+        const [countRows] = await db.query(`
+    SELECT COUNT(*) AS total FROM asset_assignment
+  `);
+        const total = countRows[0].total;
+
+        const [dataRows] = await db.query(`
+    SELECT 
+      aa.id,
+      a.name AS asset,
+      d.name AS department,
+      aa.assigned_date
+    FROM asset_assignment aa
+    JOIN assets a ON a.id = aa.asset_id
+    JOIN department d ON d.id = aa.department_id
+    ORDER BY aa.assigned_date DESC
+    LIMIT ? OFFSET ?
+  `, [limit, offset]);
+
+        return {
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            items: dataRows
+        };
     }
+
 };
 
 module.exports = Assignment;
