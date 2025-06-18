@@ -1,0 +1,27 @@
+.header {
+  background-color: #5fdaf0;
+  padding: 10px 20px;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links li a.active {
+  font-weight: bold;
+  border-bottom: 2px solid #fff;
+}
