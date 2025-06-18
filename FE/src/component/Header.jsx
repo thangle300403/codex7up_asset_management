@@ -23,7 +23,7 @@ const Header = () => {
           </li>
           <li>
             <NavLink to="/departments" activeClassName="active">
-              Assignments
+              Departments
             </NavLink>
           </li>
           <li>
