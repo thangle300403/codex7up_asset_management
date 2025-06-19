@@ -122,7 +122,62 @@ const AssetModel = {
 
         const [result] = await db.query("DELETE FROM assets WHERE id = ?", [id]);
         return result.affectedRows > 0;
-    }
+    },
+
+    async getPaginated(page = 1, limit = 10) {
+        const offset = (page - 1) * limit;
+
+        const [countRows] = await db.query(`SELECT COUNT(*) as total FROM assets`);
+        const total = countRows[0].total;
+
+        const [rows] = await db.query(`
+  SELECT 
+    a.id,
+    a.name,
+    a.description,
+    d.name AS department,
+    s.status_name AS currentStatus
+  FROM assets a
+  LEFT JOIN asset_status s ON a.status_id = s.id
+  LEFT JOIN (
+    SELECT aa.asset_id, aa.department_id
+    FROM asset_assignment aa
+    INNER JOIN (
+      SELECT asset_id, MAX(assigned_date) AS latest_date
+      FROM asset_assignment
+      GROUP BY asset_id
+    ) latest ON latest.asset_id = aa.asset_id AND latest.latest_date = aa.assigned_date
+  ) latest_assignment ON a.id = latest_assignment.asset_id
+  LEFT JOIN department d ON latest_assignment.department_id = d.id
+  ORDER BY a.id ASC
+  LIMIT ? OFFSET ?
+`, [limit, offset]);
+
+        return {
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            items: rows
+        };
+    },
+
+    async getByDepartment(departmentId) {
+        const [rows] = await db.execute(`
+      SELECT 
+        a.id, 
+        a.name, 
+        a.description, 
+        s.status_name AS status
+      FROM assets a
+      JOIN asset_assignment aa ON a.id = aa.asset_id
+      LEFT JOIN asset_status s ON a.status_id = s.id
+      WHERE aa.department_id = ?
+      GROUP BY a.id
+      ORDER BY a.id DESC
+    `, [departmentId]);
+
+        return rows;
+    },
 };
 
 module.exports = AssetModel;

@@ -28,7 +28,7 @@ const EditAsset = () => {
     });
 
     // Fetch dropdowns
-    axios.get("http://localhost:3000/api/departments").then((res) => {
+    axios.get("http://localhost:3000/api/departments/all").then((res) => {
       setDepartments(res.data);
     });
 

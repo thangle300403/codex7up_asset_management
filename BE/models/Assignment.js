@@ -65,7 +65,7 @@ const Assignment = {
     FROM asset_assignment aa
     JOIN assets a ON a.id = aa.asset_id
     JOIN department d ON d.id = aa.department_id
-    ORDER BY aa.assigned_date DESC
+    ORDER BY aa.assigned_date ASC
     LIMIT ? OFFSET ?
   `, [limit, offset]);
 

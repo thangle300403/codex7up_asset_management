@@ -15,10 +15,19 @@ const AddAssignment = () => {
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/assets")
-      .then((res) => setAssets(res.data));
+      .then((res) => setAssets(res.data.items || [])) // ✅ Handle paginated response
+      .catch((err) => {
+        console.error("Failed to load assets:", err);
+        setAssets([]);
+      });
+
     axios
-      .get("http://localhost:3000/api/departments")
-      .then((res) => setDepartments(res.data));
+      .get("http://localhost:3000/api/departments/all")
+      .then((res) => setDepartments(res.data))
+      .catch((err) => {
+        console.error("Failed to load departments:", err);
+        setDepartments([]);
+      });
   }, []);
 
   const handleChange = (e) => {

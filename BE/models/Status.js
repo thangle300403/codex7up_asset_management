@@ -39,6 +39,27 @@ const StatusModel = {
 
         const [result] = await db.query("DELETE FROM asset_status WHERE id = ?", [id]);
         return result.affectedRows > 0;
+    },
+
+    async getPaginated(page = 1, limit = 10) {
+        const offset = (page - 1) * limit;
+
+        const [countRows] = await db.query(`SELECT COUNT(*) AS total FROM asset_status`);
+        const total = countRows[0].total;
+
+        const [rows] = await db.query(`
+      SELECT id, status_name
+      FROM asset_status
+      ORDER BY id ASC
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
+
+        return {
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            items: rows
+        };
     }
 };
 

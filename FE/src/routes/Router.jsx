@@ -13,6 +13,9 @@ import EditDepartment from "../pages/department/EditDepartment";
 import AddAssignment from "../pages/asset_asignment/AddAssignment";
 import AssignmentList from "../pages/asset_asignment/AssignmentList";
 import EditAssignment from "../pages/asset_asignment/EditAssignment";
+import Login from "../pages/login/Login";
+import FillReport from "../component/FillReport";
+import ReportList from "../pages/report/ReportList";
 
 const AppRoutes = () => {
   return (
@@ -33,6 +36,11 @@ const AppRoutes = () => {
       <Route path="/assignments" element={<AssignmentList />} />
       <Route path="/assignments/add" element={<AddAssignment />} />
       <Route path="/assignments/edit/:id" element={<EditAssignment />} />
+      <Route path="/login" element={<Login />} />
+
+      <Route path="/report/fill" element={<FillReport />} />
+
+      <Route path="/reports" element={<ReportList />} />
     </Routes>
   );
 };

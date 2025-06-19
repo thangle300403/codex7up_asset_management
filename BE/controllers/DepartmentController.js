@@ -76,6 +76,19 @@ const DepartmentController = {
             res.status(400).json({ message: err.message });
         }
     },
+
+    async getPaginated(req, res) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+
+            const data = await DepartmentModel.getPaginated(page, limit);
+            res.json(data);
+        } catch (err) {
+            console.error("Error fetching paginated assignments:", err);
+            res.status(500).json({ message: "Error loading paginated assignments" });
+        }
+    },
 };
 
 module.exports = DepartmentController;
