@@ -1,11 +1,10 @@
 // components/Header.jsx
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useSearch } from "../context/SearchContext"; // ✅ only if using SearchContext
+import { useSearch } from "../context/SearchContext"; 
 import "./Header.css";
 
 const Header = () => {
-  // ✅ Use context if you have SearchContext:
   const { searchTerm, setSearchTerm } = useSearch(); 
 
   return (
