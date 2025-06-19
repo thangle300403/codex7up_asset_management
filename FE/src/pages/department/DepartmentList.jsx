@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Pagination from "../../component/Pagination";
+import { useSearch } from "../../context/SearchContext";
 
 const DepartmentList = () => {
   const [departments, setDepartments] = useState([]);
@@ -9,6 +10,8 @@ const DepartmentList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 5;
+
+  const { searchTerm } = useSearch();
 
   const fetchDepartments = async (page) => {
     try {
@@ -18,9 +21,9 @@ const DepartmentList = () => {
       );
       setDepartments(res.data.items);
       setTotalPages(res.data.totalPages);
-      setLoading(false);
     } catch (err) {
       console.error("Error fetching departments:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -35,7 +38,7 @@ const DepartmentList = () => {
         .delete(`http://localhost:3000/api/departments/${id}`)
         .then(() => {
           alert("Department deleted!");
-          fetchDepartments(currentPage); // refresh current page
+          setDepartments((prev) => prev.filter((d) => d.id !== id));
         })
         .catch((err) => {
           alert(err.response?.data?.message || "Delete failed");
@@ -43,7 +46,9 @@ const DepartmentList = () => {
     }
   };
 
-  if (loading) return <p>Loading departments...</p>;
+  const filteredDepartments = departments.filter((d) =>
+    (d.name || "").toLowerCase().includes((searchTerm || "").toLowerCase())
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -57,51 +62,53 @@ const DepartmentList = () => {
         </Link>
       </div>
 
-      {departments.length === 0 ? (
-        <p>No departments found.</p>
-      ) : (
-        <>
-          <table
-            border="1"
-            cellPadding="10"
-            cellSpacing="0"
-            style={{ width: "100%", borderCollapse: "collapse" }}
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Actions</th>
+      <table
+        border="1"
+        cellPadding="10"
+        cellSpacing="0"
+        style={{ width: "100%", borderCollapse: "collapse" }}
+      >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredDepartments.length === 0 ? (
+            <tr>
+              <td colSpan="3" style={{ textAlign: "center" }}>
+                No departments found.
+              </td>
+            </tr>
+          ) : (
+            filteredDepartments.map((d) => (
+              <tr key={d.id}>
+                <td>{d.id}</td>
+                <td>{d.name}</td>
+                <td>
+                  <Link to={`/departments/edit/${d.id}`}>
+                    <button>Edit</button>
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(d.id)}
+                    style={{ marginLeft: "8px" }}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {departments.map((d) => (
-                <tr key={d.id}>
-                  <td>{d.id}</td>
-                  <td>{d.name}</td>
-                  <td>
-                    <Link to={`/departments/edit/${d.id}`}>
-                      <button>Edit</button>
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(d.id)}
-                      style={{ marginLeft: "8px" }}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))
+          )}
+        </tbody>
+      </table>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
-        </>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
 };

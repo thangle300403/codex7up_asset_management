@@ -31,12 +31,8 @@ const tableStyles = {
     borderRadius: "6px",
     fontWeight: "bold",
     cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
     fontSize: "14px",
     transition: "background-color 0.2s",
-    marginRight: "8px",
   },
   table: {
     width: "100%",
@@ -92,11 +88,11 @@ const getStatusStyle = (status) => {
 const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [statusList, setStatusList] = useState([]);
-  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const location = useLocation();
   const searchQuery = new URLSearchParams(location.search).get("search") || "";
   const limit = 5;
@@ -165,6 +161,10 @@ const AssetList = () => {
     );
   }
 
+  const filteredAssets = assets.filter((a) =>
+    selectedStatus === "" ? true : a.currentStatus === selectedStatus
+  );
+
   return (
     <div
       style={{
@@ -196,7 +196,6 @@ const AssetList = () => {
                 border: "1px solid #ccc",
                 fontSize: "14px",
                 minWidth: "160px",
-                marginRight: "8px",
               }}
             >
               <option value="">-- All Statuses --</option>
@@ -221,13 +220,14 @@ const AssetList = () => {
             </tr>
           </thead>
           <tbody>
-            {assets
-              .filter((a) =>
-                selectedStatus === ""
-                  ? true
-                  : a.currentStatus === selectedStatus
-              )
-              .map((a) => (
+            {filteredAssets.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No assets found for selected status.
+                </td>
+              </tr>
+            ) : (
+              filteredAssets.map((a) => (
                 <tr key={a.id}>
                   <td style={tableStyles.td}>{a.id}</td>
                   <td style={tableStyles.td}>{a.name}</td>
@@ -236,10 +236,11 @@ const AssetList = () => {
                   <td style={tableStyles.td}>
                     <span
                       style={{
-                        ...getStatusStyle(a.currentStatus),
                         padding: "4px 8px",
                         borderRadius: "12px",
                         fontSize: "12px",
+                        whiteSpace: "nowrap",
+                        ...getStatusStyle(a.currentStatus),
                       }}
                     >
                       {a.currentStatus}
@@ -267,17 +268,7 @@ const AssetList = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
-            {assets.filter((a) =>
-              selectedStatus === "" ? true : a.currentStatus === selectedStatus
-            ).length === 0 && (
-              <tr>
-                <td style={tableStyles.td} colSpan="6">
-                  <p style={{ textAlign: "center", margin: 0 }}>
-                    No assets found for selected status.
-                  </p>
-                </td>
-              </tr>
+              ))
             )}
           </tbody>
         </table>

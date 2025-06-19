@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Box } from "../../components/Box";
 import Pagination from "../../components/Pagination";
+import { useSearch } from "../../context/SearchContext"; 
 
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
@@ -10,6 +11,8 @@ const AssignmentList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 6;
+
+  const { searchTerm } = useSearch(); 
 
   const fetchAssignments = async (page) => {
     try {
@@ -19,9 +22,9 @@ const AssignmentList = () => {
       );
       setAssignments(res.data.items);
       setTotalPages(res.data.totalPages);
-      setLoading(false);
     } catch (err) {
       console.error("Error fetching assignments:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -43,6 +46,15 @@ const AssignmentList = () => {
         });
     }
   };
+
+  const filteredAssignments = assignments.filter((a) => {
+    const term = (searchTerm || "").toLowerCase();
+    return (
+      (a.asset || "").toLowerCase().includes(term) ||
+      (a.department || "").toLowerCase().includes(term) ||
+      (a.assigned_date || "").toLowerCase().includes(term)
+    );
+  });
 
   if (loading) return <p>Loading assignments...</p>;
 
@@ -91,10 +103,10 @@ const AssignmentList = () => {
           minHeight: "50vh",
         }}
       >
-        {assignments.length === 0 ? (
+        {filteredAssignments.length === 0 ? (
           <p>No assignments found.</p>
         ) : (
-          assignments.map((a) => (
+          filteredAssignments.map((a) => (
             <Box
               key={a.id}
               style={{
@@ -121,9 +133,11 @@ const AssignmentList = () => {
                   <h3>
                     <strong>ID:</strong> {a.id}
                   </h3>
-                  <h3>
-                    <strong>Asset:</strong> {a.asset}
-                  </h3>
+                  <div style={{ maxWidth: "200px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <h3>
+                      <strong>Asset:</strong> {a.asset}
+                    </h3>
+                  </div>
                   <div
                     className="buttons-container"
                     style={{
