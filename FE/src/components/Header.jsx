@@ -26,8 +26,6 @@ const Header = () => {
                 color: "white",
                 textDecoration: "none",
                 fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
               }}
             >
               <img
@@ -45,7 +43,6 @@ const Header = () => {
           style={{
             display: "flex",
             alignItems: "center",
-            width: "100%", // ✅ corrected capital 'Width'
           }}
         >
           <input
