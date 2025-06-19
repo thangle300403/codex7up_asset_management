@@ -102,6 +102,9 @@ const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { searchTerm } = useSearch(); 
+
   const [selectedStatus, setSelectedStatus] = useState("");
   const [statusList, setStatusList] = useState([]);
 
@@ -157,7 +160,7 @@ const AssetList = () => {
     );
   }
 
-  if (error) {
+  if (error)
     return (
       <div style={tableStyles.container}>
         <p style={{ textAlign: "center", color: "#e74c3c" }}>
@@ -165,7 +168,6 @@ const AssetList = () => {
         </p>
       </div>
     );
-  }
 
   return (
     <div
@@ -176,6 +178,74 @@ const AssetList = () => {
       }}
     >
       <div style={tableStyles.container}>
+        <div style={tableStyles.header}>
+          <h2 style={tableStyles.title}>Asset Management</h2>
+          <Link to="/assets/add" style={{ textDecoration: "none" }}>
+            <button style={tableStyles.addButton}>Add New Asset</button>
+          </Link>
+        </div>
+
+        {filteredAssets.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#2c3e50" }}>
+            No assets match your search.
+          </p>
+        ) : (
+          <table style={tableStyles.table}>
+            <thead>
+              <tr>
+                <th style={tableStyles.th}>ID</th>
+                <th style={tableStyles.th}>Name</th>
+                <th style={tableStyles.th}>Description</th>
+                <th style={tableStyles.th}>Department</th>
+                <th style={tableStyles.th}>Status</th>
+                <th style={tableStyles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAssets.map((a) => (
+                <tr key={a.id}>
+                  <td style={tableStyles.td}>{a.id}</td>
+                  <td style={tableStyles.td}>{a.name}</td>
+                  <td style={tableStyles.td}>{a.description}</td>
+                  <td style={tableStyles.td}>{a.department}</td>
+                  <td style={tableStyles.td}>
+                    <span
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        ...getStatusStyle(a.currentStatus),
+                      }}
+                    >
+                      {a.currentStatus}
+                    </span>
+                  </td>
+                  <td style={tableStyles.td}>
+                    <Link to={`/assets/edit/${a.id}`}>
+                      <button
+                        style={{
+                          ...tableStyles.actionButton,
+                          ...tableStyles.editButton,
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      style={{
+                        ...tableStyles.actionButton,
+                        ...tableStyles.deleteButton,
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         {/* Header & Filter */}
           <div style={tableStyles.header}>
             <h2 style={tableStyles.title}>Asset Management</h2>
