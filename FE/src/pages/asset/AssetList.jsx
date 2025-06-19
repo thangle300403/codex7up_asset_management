@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const tableStyles = {
+
+const tableStyles = {  //CSS
   container: {
     padding: "32px",
     maxWidth: "1200px",
@@ -26,7 +27,7 @@ const tableStyles = {
     backgroundColor: "#3498db",
     color: "white",
     border: "none",
-    padding: "10px 20px",
+    padding: "10px 28px",
     borderRadius: "6px",
     fontWeight: "bold",
     cursor: "pointer",
@@ -35,6 +36,7 @@ const tableStyles = {
     gap: "8px",
     fontSize: "14px",
     transition: "background-color 0.2s",
+    marginRight: "8px",
   },
   table: {
     width: "100%",
@@ -68,6 +70,7 @@ const tableStyles = {
     backgroundColor: "#2ecc71",
     color: "white",
     marginRight: "8px",
+    marginBottom: "8px",
   },
   deleteButton: {
     backgroundColor: "#e74c3c",
@@ -75,7 +78,7 @@ const tableStyles = {
   },
 };
 
-const getStatusStyle = (status) => {
+const getStatusStyle = (status) => {    //CSS
   switch (status) {
     case "In Use":
       return {
@@ -99,7 +102,23 @@ const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [statusList, setStatusList] = useState([]);
 
+  // Fetch status list
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/statuses");
+        setStatusList(res.data);
+      } catch (err) {
+        console.error("Failed to fetch statuses:", err);
+      }
+    };
+    fetchStatuses();
+  }, []);
+
+  // Fetch assets
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -112,7 +131,6 @@ const AssetList = () => {
         setLoading(false);
       }
     };
-
     fetchAssets();
   }, []);
 
@@ -120,7 +138,7 @@ const AssetList = () => {
     if (window.confirm("Are you sure you want to delete this asset?")) {
       try {
         await axios.delete(`http://localhost:3000/api/assets/${id}`);
-        setAssets(assets.filter((asset) => asset.id !== id)); // Update state instead of reload
+        setAssets((prev) => prev.filter((asset) => asset.id !== id));
         alert("Asset deleted successfully!");
       } catch (err) {
         console.error("Delete failed:", err);
@@ -129,12 +147,15 @@ const AssetList = () => {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div style={tableStyles.container}>
-        <p style={{ textAlign: "center", color: "#2c3e50" }}>Loading assets...</p>
+        <p style={{ textAlign: "center", color: "#2c3e50" }}>
+          Loading assets...
+        </p>
       </div>
     );
+  }
 
   if (error) {
     return (
@@ -147,17 +168,44 @@ const AssetList = () => {
   }
 
   return (
-    <div style={{ backgroundColor: "#f4f4f4", minHeight: "100vh", padding: "20px" }}>
+    <div
+      style={{
+        backgroundColor: "#f4f4f4",
+        minHeight: "100vh",
+        padding: "20px",
+      }}
+    >
       <div style={tableStyles.container}>
-        <div style={tableStyles.header}>
-          <h2 style={tableStyles.title}>Asset Management</h2>
-          <Link to="/assets/add" style={{ textDecoration: "none" }}>
-            <button style={tableStyles.addButton}>
-              Add New Asset
-            </button>
-          </Link>
-        </div>
-
+        {/* Header & Filter */}
+          <div style={tableStyles.header}>
+            <h2 style={tableStyles.title}>Asset Management</h2>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <Link to="/assets/add" style={{ textDecoration: "none" }}>
+                <button style={tableStyles.addButton}>Add New Asset</button>
+              </Link>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{
+            marginTop: "8px",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            fontSize: "14px",
+                  minWidth: "160px",
+            marginRight: "8px",
+                }}
+              >
+                <option value="">-- All Statuses --</option>
+                {statusList.map((s) => (
+            <option key={s.id} value={s.status_name}>
+              {s.status_name}
+            </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
         <table style={tableStyles.table}>
           <thead>
             <tr>
@@ -170,47 +218,63 @@ const AssetList = () => {
             </tr>
           </thead>
           <tbody>
-            {assets.map((a) => (
-              <tr key={a.id}>
-                <td style={tableStyles.td}>{a.id}</td>
-                <td style={tableStyles.td}>{a.name}</td>
-                <td style={tableStyles.td}>{a.description}</td>
-                <td style={tableStyles.td}>{a.department}</td>
-                <td style={tableStyles.td}>
-                  <span
-                    style={{
-                      padding: "4px 8px",
-                      borderRadius: "12px",
-                      fontSize: "12px",
-                      ...getStatusStyle(a.currentStatus),
-                    }}
-                  >
-                    {a.currentStatus}
-                  </span>
-                </td>
-                <td style={tableStyles.td}>
-                  <Link to={`/assets/edit/${a.id}`}>
-                    <button
+            {assets
+              .filter((a) =>
+                selectedStatus === "" ? true : a.currentStatus === selectedStatus
+              )
+              .map((a) => (
+                <tr key={a.id}>
+                  <td style={tableStyles.td}>{a.id}</td>
+                  <td style={tableStyles.td}>{a.name}</td>
+                  <td style={tableStyles.td}>{a.description}</td>
+                  <td style={tableStyles.td}>{a.department}</td>
+                  <td style={tableStyles.td}>
+                    <span
                       style={{
-                        ...tableStyles.actionButton,
-                        ...tableStyles.editButton,
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        whiteSpace: "nowrap",
+                        ...getStatusStyle(a.currentStatus),
                       }}
                     >
-                      Edit
+                      {a.currentStatus}
+                    </span>
+                  </td>
+                  <td style={tableStyles.td}>
+                    <Link to={`/assets/edit/${a.id}`}>
+                      <button
+                        style={{
+                          ...tableStyles.actionButton,
+                          ...tableStyles.editButton,
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      style={{
+                        ...tableStyles.actionButton,
+                        ...tableStyles.deleteButton,
+                      }}
+                    >
+                      Delete
                     </button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(a.id)}
-                    style={{
-                      ...tableStyles.actionButton,
-                      ...tableStyles.deleteButton,
-                    }}
-                  >
-                    Delete
-                  </button>
+                  </td>
+                </tr>
+              ))}
+            {assets.filter((a) =>
+              selectedStatus === "" ? true : a.currentStatus === selectedStatus
+            ).length === 0 && (
+              <tr>
+                <td style={tableStyles.td} colSpan="6">
+                  <p style={{ textAlign: "center", margin: 0 }}>
+                    No assets found for selected status.
+                  </p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
