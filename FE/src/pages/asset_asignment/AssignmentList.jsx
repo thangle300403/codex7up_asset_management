@@ -121,9 +121,11 @@ const AssignmentList = () => {
                   <h3>
                     <strong>ID:</strong> {a.id}
                   </h3>
-                  <h3>
-                    <strong>Asset:</strong> {a.asset}
-                  </h3>
+                  <div style={{maxWidth: "200px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+                    <h3>
+                      <strong>Asset:</strong> {a.asset}
+                    </h3>
+                  </div>
                   <div
                     className="buttons-container"
                     style={{
