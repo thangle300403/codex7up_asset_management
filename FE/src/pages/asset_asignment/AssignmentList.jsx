@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../components/box";
+import { Box } from "../../components/Box";
 import Pagination from "../../components/Pagination";
 
 const AssignmentList = () => {
