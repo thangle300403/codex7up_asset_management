@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useSearch } from "../../context/SearchContext";
 
 const tableStyles = {
   container: {
@@ -100,6 +101,8 @@ const AssetList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { searchTerm } = useSearch(); // ✅ GET searchTerm from context
+
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -120,7 +123,7 @@ const AssetList = () => {
     if (window.confirm("Are you sure you want to delete this asset?")) {
       try {
         await axios.delete(`http://localhost:3000/api/assets/${id}`);
-        setAssets(assets.filter((asset) => asset.id !== id)); // Update state instead of reload
+        setAssets((prev) => prev.filter((asset) => asset.id !== id));
         alert("Asset deleted successfully!");
       } catch (err) {
         console.error("Delete failed:", err);
@@ -129,6 +132,17 @@ const AssetList = () => {
     }
   };
 
+  // ✅ Filter assets based on searchTerm
+  const filteredAssets = assets.filter((a) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      a.name?.toLowerCase().includes(term) ||
+      a.description?.toLowerCase().includes(term) ||
+      a.department?.toLowerCase().includes(term) ||
+      a.currentStatus?.toLowerCase().includes(term)
+    );
+  });
+
   if (loading)
     return (
       <div style={tableStyles.container}>
@@ -136,7 +150,7 @@ const AssetList = () => {
       </div>
     );
 
-  if (error) {
+  if (error)
     return (
       <div style={tableStyles.container}>
         <p style={{ textAlign: "center", color: "#e74c3c" }}>
@@ -144,7 +158,6 @@ const AssetList = () => {
         </p>
       </div>
     );
-  }
 
   return (
     <div style={{ backgroundColor: "#f4f4f4", minHeight: "100vh", padding: "20px" }}>
@@ -152,67 +165,71 @@ const AssetList = () => {
         <div style={tableStyles.header}>
           <h2 style={tableStyles.title}>Asset Management</h2>
           <Link to="/assets/add" style={{ textDecoration: "none" }}>
-            <button style={tableStyles.addButton}>
-              Add New Asset
-            </button>
+            <button style={tableStyles.addButton}>Add New Asset</button>
           </Link>
         </div>
 
-        <table style={tableStyles.table}>
-          <thead>
-            <tr>
-              <th style={tableStyles.th}>ID</th>
-              <th style={tableStyles.th}>Name</th>
-              <th style={tableStyles.th}>Description</th>
-              <th style={tableStyles.th}>Department</th>
-              <th style={tableStyles.th}>Status</th>
-              <th style={tableStyles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {assets.map((a) => (
-              <tr key={a.id}>
-                <td style={tableStyles.td}>{a.id}</td>
-                <td style={tableStyles.td}>{a.name}</td>
-                <td style={tableStyles.td}>{a.description}</td>
-                <td style={tableStyles.td}>{a.department}</td>
-                <td style={tableStyles.td}>
-                  <span
-                    style={{
-                      padding: "4px 8px",
-                      borderRadius: "12px",
-                      fontSize: "12px",
-                      ...getStatusStyle(a.currentStatus),
-                    }}
-                  >
-                    {a.currentStatus}
-                  </span>
-                </td>
-                <td style={tableStyles.td}>
-                  <Link to={`/assets/edit/${a.id}`}>
-                    <button
+        {filteredAssets.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#2c3e50" }}>
+            No assets match your search.
+          </p>
+        ) : (
+          <table style={tableStyles.table}>
+            <thead>
+              <tr>
+                <th style={tableStyles.th}>ID</th>
+                <th style={tableStyles.th}>Name</th>
+                <th style={tableStyles.th}>Description</th>
+                <th style={tableStyles.th}>Department</th>
+                <th style={tableStyles.th}>Status</th>
+                <th style={tableStyles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAssets.map((a) => (
+                <tr key={a.id}>
+                  <td style={tableStyles.td}>{a.id}</td>
+                  <td style={tableStyles.td}>{a.name}</td>
+                  <td style={tableStyles.td}>{a.description}</td>
+                  <td style={tableStyles.td}>{a.department}</td>
+                  <td style={tableStyles.td}>
+                    <span
                       style={{
-                        ...tableStyles.actionButton,
-                        ...tableStyles.editButton,
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                        ...getStatusStyle(a.currentStatus),
                       }}
                     >
-                      Edit
+                      {a.currentStatus}
+                    </span>
+                  </td>
+                  <td style={tableStyles.td}>
+                    <Link to={`/assets/edit/${a.id}`}>
+                      <button
+                        style={{
+                          ...tableStyles.actionButton,
+                          ...tableStyles.editButton,
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      style={{
+                        ...tableStyles.actionButton,
+                        ...tableStyles.deleteButton,
+                      }}
+                    >
+                      Delete
                     </button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(a.id)}
-                    style={{
-                      ...tableStyles.actionButton,
-                      ...tableStyles.deleteButton,
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

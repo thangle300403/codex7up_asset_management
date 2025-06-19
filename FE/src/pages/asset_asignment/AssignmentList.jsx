@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../components/box";
+import { Box } from "../../components/Box";
 import Pagination from "../../components/Pagination";
 
 const AssignmentList = () => {
@@ -121,9 +121,11 @@ const AssignmentList = () => {
                   <h3>
                     <strong>ID:</strong> {a.id}
                   </h3>
+                  <div style={{ maxWidth: "200px", overflow: "hidden", whiteSpace: "nowrap"}}>
                   <h3>
                     <strong>Asset:</strong> {a.asset}
                   </h3>
+                  </div>
                   <div
                     className="buttons-container"
                     style={{
