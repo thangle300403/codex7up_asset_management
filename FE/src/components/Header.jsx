@@ -44,7 +44,7 @@ const Header = () => {
           style={{
             display: "flex",
             alignItems: "center",
-            width: "100%", // ✅ corrected capital 'Width'
+            width: "100%",
           }}
         >
           <input

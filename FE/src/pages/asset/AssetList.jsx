@@ -101,7 +101,7 @@ const AssetList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { searchTerm } = useSearch(); // ✅ GET searchTerm from context
+  const { searchTerm } = useSearch(); 
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -132,7 +132,6 @@ const AssetList = () => {
     }
   };
 
-  // ✅ Filter assets based on searchTerm
   const filteredAssets = assets.filter((a) => {
     const term = searchTerm.toLowerCase();
     return (
