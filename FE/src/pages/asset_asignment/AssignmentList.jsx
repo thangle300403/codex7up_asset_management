@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../component/Box";
-import Pagination from "../../component/Pagination";
+import { Box } from "../../components/Box";
+import Pagination from "../../components/Pagination";
 
 const AssignmentList = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const limit = 6;
 
   const fetchAssignments = async (page) => {
     try {
@@ -47,16 +47,23 @@ const AssignmentList = () => {
   if (loading) return <p>Loading assignments...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Asset Assignments</h1>
-
-      <div style={{ marginBottom: "16px" }}>
+    <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f4f4f4" }}>
+      {/* Header */}
+      <div
+        style={{
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 style={{ color: "#2c3e50" }}>Asset Assignments</h1>
         <Link to="/assignments/add">
           <button
             style={{
               padding: "8px 16px",
               fontWeight: "bold",
-              backgroundColor: "#4CAF50",
+              backgroundColor: "#3498db",
               color: "white",
               border: "none",
               borderRadius: "4px",
@@ -67,13 +74,21 @@ const AssignmentList = () => {
         </Link>
       </div>
 
-      <div
-        className="assignment-list"
+      {/* White Form that contains all Boxes */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          alert("Form submitted!");
+        }}
         style={{
+          backgroundColor: "white",
+          padding: "24px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           display: "flex",
-          flexDirection: "row",
-          gap: "16px",
           flexWrap: "wrap",
+          gap: "16px",
+          minHeight: "50vh",
         }}
       >
         {assignments.length === 0 ? (
@@ -94,7 +109,14 @@ const AssignmentList = () => {
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <div
                   className="title"
-                  style={{ display: "flex", justifyContent: "space-between" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                    color: "#2c3e50",
+                  }}
                 >
                   <h3>
                     <strong>ID:</strong> {a.id}
@@ -102,6 +124,43 @@ const AssignmentList = () => {
                   <h3>
                     <strong>Asset:</strong> {a.asset}
                   </h3>
+                  <div
+                    className="buttons-container"
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      marginTop: "8px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Link to={`/assignments/edit/${a.id}`}>
+                      <button
+                        type="button"
+                        style={{
+                          padding: "8px 16px",
+                          backgroundColor: "#4CAF50",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(a.id)}
+                      style={{
+                        border: "none",
+                        backgroundColor: "#ff4d4d",
+                        color: "white",
+                        padding: "8px 16px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
                 <div className="description">
                   <p>
@@ -112,42 +171,13 @@ const AssignmentList = () => {
                     {new Date(a.assigned_date).toLocaleDateString()}
                   </p>
                 </div>
-                <div
-                  className="buttons-container"
-                  style={{ display: "flex", gap: "8px", marginTop: "8px" }}
-                >
-                  <Link to={`/assignments/edit/${a.id}`}>
-                    <button
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      Edit
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(a.id)}
-                    style={{
-                      border: "none",
-                      backgroundColor: "#ff4d4d",
-                      color: "white",
-                      padding: "8px 16px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
               </div>
             </Box>
           ))
         )}
-      </div>
+      </form>
 
+      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

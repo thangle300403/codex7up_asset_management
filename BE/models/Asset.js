@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require("../db");
 
 const AssetModel = {
     // ✅ Get all assets
@@ -19,15 +19,30 @@ const AssetModel = {
         return rows;
     },
 
+    async sortAssets(statusName) {
+        const [rows] = await db.query(
+            `
+      SELECT 
+        a.id,
+        a.name,
+        a.description,
+        d.name AS department,
+        s.status_name AS currentStatus
+      FROM assets a
+      LEFT JOIN asset_assignment aa ON aa.asset_id = a.id
+      LEFT JOIN department d ON d.id = aa.department_id
+      LEFT JOIN asset_status s ON s.id = a.status_id
+      WHERE s.status_name = ?
+      ORDER BY a.id;
+    `,
+            [statusName]
+        );
+        return rows;
+    },
+
     // ✅ Add new asset with assignment
     async addAssetWithAssignment(data) {
-        const {
-            name,
-            description,
-            status_id,
-            department_id,
-            assigned_date
-        } = data;
+        const { name, description, status_id, department_id, assigned_date } = data;
 
         const conn = await db.getConnection();
         try {
@@ -35,14 +50,14 @@ const AssetModel = {
 
             // 1. Insert into assets
             const [assetResult] = await conn.query(
-                'INSERT INTO assets (name, description, status_id) VALUES (?, ?, ?)',
+                "INSERT INTO assets (name, description, status_id) VALUES (?, ?, ?)",
                 [name, description, status_id]
             );
             const asset_id = assetResult.insertId;
 
             // 2. Insert into asset_assignment
             await conn.query(
-                'INSERT INTO asset_assignment (asset_id, department_id, assigned_date) VALUES (?, ?, ?)',
+                "INSERT INTO asset_assignment (asset_id, department_id, assigned_date) VALUES (?, ?, ?)",
                 [asset_id, department_id, assigned_date]
             );
 
