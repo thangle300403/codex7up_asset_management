@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Box } from "../../components/Box";
-import Pagination from "../../components/Pagination";
+import { Box } from "../../component/Box";
+import Pagination from "../../component/Pagination";
 import { useSearch } from "../../context/SearchContext"; 
 
 const AssignmentList = () => {

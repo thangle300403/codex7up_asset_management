@@ -1,114 +1,143 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Pagination from "../../component/Pagination";
-import { useSearch } from "../../context/SearchContext";
+
+
+const styles = {
+  container: {
+    padding: "20px",
+    maxWidth: "1200px",
+    margin: "0 auto", // Center the container
+    backgroundColor: "#f9f9f9",
+    borderRadius: "8px",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+  },
+  title: {
+    fontSize: "24px",
+    color: "#333",
+    margin: 0,
+  },
+  addButton: {
+    backgroundColor: "cyan",
+    color: "black",
+    border: "none",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    textDecoration: "none", // Remove underline from link
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginTop: "20px",
+  },
+  th: {
+    backgroundColor: "#f2f2f2",
+    padding: "12px",
+    textAlign: "left",
+    borderBottom: "1px solid #ddd",
+  },
+  td: {
+    padding: "12px",
+    borderBottom: "1px solid #ddd",
+  },
+
+  actionButton: {
+    padding: "6px 12px",
+    backgroundColor: "#007BFF",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginRight: "8px",
+  },
+  deleteButton: {
+    padding: "6px 12px",
+    backgroundColor: "#dc3545",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+
+};
+
+const handleDelete = (id) => {
+  if (window.confirm("Are you sure you want to delete this department?")) {
+    axios
+      .delete(`http://localhost:3000/api/departments/${id}`)
+      .then(() => {
+        alert("Department deleted!");
+        window.location.reload(); // Or update state
+      })
+      .catch((err) => {
+        alert(err.response?.data?.message || "Delete failed");
+      });
+  }
+};
 
 const DepartmentList = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
-
-  const { searchTerm } = useSearch();
-
-  const fetchDepartments = async (page) => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `http://localhost:3000/api/departments?page=${page}&limit=${limit}`
-      );
-      setDepartments(res.data.items);
-      setTotalPages(res.data.totalPages);
-    } catch (err) {
-      console.error("Error fetching departments:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchDepartments(currentPage);
-  }, [currentPage]);
+    axios
+      .get("http://localhost:3000/api/departments")
+      .then((res) => {
+        setDepartments(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching departments:", err);
+        setLoading(false);
+      });
+  }, []);
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this department?")) {
-      axios
-        .delete(`http://localhost:3000/api/departments/${id}`)
-        .then(() => {
-          alert("Department deleted!");
-          setDepartments((prev) => prev.filter((d) => d.id !== id));
-        })
-        .catch((err) => {
-          alert(err.response?.data?.message || "Delete failed");
-        });
-    }
-  };
-
-  const filteredDepartments = departments.filter((d) =>
-    (d.name || "").toLowerCase().includes((searchTerm || "").toLowerCase())
-  );
+  if (loading) return <p>Loading departments...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Department List</h2>
-
-      <div style={{ marginBottom: "16px" }}>
-        <Link to="/departments/add">
-          <button style={{ padding: "8px 16px", fontWeight: "bold" }}>
-            ➕ Add Department
-          </button>
+    <div style={{ ...styles.container }}>
+      <div style={{ ...styles.header }}>
+        <h1 style={{ ...styles.title }}>Departments</h1>
+        <Link to="/departments/add" style={{ ...styles.addButton }}>
+          ➕ Add Department
         </Link>
       </div>
-
-      <table
-        border="1"
-        cellPadding="10"
-        cellSpacing="0"
-        style={{ width: "100%", borderCollapse: "collapse" }}
-      >
+      <table style={{ ...styles.table }}>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Actions</th>
+            <th style={{ ...styles.th }}>ID</th>
+            <th style={{ ...styles.th }}>Name</th>
+            <th style={{ ...styles.th }}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredDepartments.length === 0 ? (
-            <tr>
-              <td colSpan="3" style={{ textAlign: "center" }}>
-                No departments found.
+          {departments.map((department) => (
+            <tr key={department.id}>
+              <td style={{ ...styles.td }}>{department.id}</td>
+              <td style={{ ...styles.td }}>{department.name}</td>
+              <td style={{ ...styles.td }}>
+                <Link to={`/departments/edit/${department.id}`}>
+                  <button style={{ ...styles.actionButton }}>📝 Edit</button>
+                </Link>
+                <button
+                  onClick={() => handleDelete(department.id)}
+                  style={{ ...styles.deleteButton }}
+                >
+                  🗑️ Delete
+                </button>
               </td>
             </tr>
-          ) : (
-            filteredDepartments.map((d) => (
-              <tr key={d.id}>
-                <td>{d.id}</td>
-                <td>{d.name}</td>
-                <td>
-                  <Link to={`/departments/edit/${d.id}`}>
-                    <button>Edit</button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(d.id)}
-                    style={{ marginLeft: "8px" }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
+          ))}
         </tbody>
       </table>
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
-      />
     </div>
   );
 };
